@@ -72,3 +72,5 @@ _ReSharper*/
 *.tar.gz
 tests/bufoverrun
 tests/symresolve
+/.vs/udis86/v16/Browse.VC.db
+/BuildVS2019/.vs/udis86/v16
