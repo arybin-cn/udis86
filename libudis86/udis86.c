@@ -170,8 +170,8 @@ ud_insn_hex(struct ud* u)
     /* for each byte used to decode instruction */
     for (i = 0; i < ud_insn_len(u) && i < sizeof(u->insn_hexcode) / 2;
          ++i, ++src_ptr) {
-      sprintf(src_hex, "%02x", *src_ptr & 0xFF);
-      src_hex += 2;
+      sprintf(src_hex, "%02X ", *src_ptr & 0xFF);
+      src_hex += 3;
     }
   }
   return u->insn_hexcode;
