@@ -485,17 +485,25 @@ decode_imm(struct ud* u, unsigned int size, struct ud_operand* op)
 	op->type = UD_OP_IMM;
 
 	switch (op->size) {
-	case  8: op->lval.sbyte = inp_uint8(u);   break;
-	case 16: op->lval.uword = inp_uint16(u);  break;
-	case 32: op->lval.udword = inp_uint32(u); break;
-	case 64: op->lval.uqword = inp_uint64(u); break;
-	default: return;
-	}
-
+	case  8: 
+		op->lval.sbyte = inp_uint8(u);
+		break;
+	case 16: 
+		op->lval.uword = inp_uint16(u);
+		break;
+	case 32: 
+		op->lval.udword = inp_uint32(u);
+		break;
+	case 64: 
+		op->lval.uqword = inp_uint64(u);
+		break;
+	default:
+		return;
+	} 
 	u->have_imm = 1;
-	u->imm_size = size / 8;
+	u->imm_size = op->size / 8;
 	u->imm_offset = u->inp_ctr - u->imm_size;
-	u->imm = op->lval.uqword; 
+	u->imm = op->lval.uqword;
 }
 
 
@@ -606,7 +614,9 @@ decode_modrm_rm(struct ud* u,
 		 */
 		if ((rm & 7) == 4) {
 			inp_next(u);
-
+			u->have_sib = 1;
+			u->sib_offset = u->inp_ctr - 1;
+			u->sib = inp_curr(u);
 			op->base = UD_R_RAX + (SIB_B(inp_curr(u)) | (REX_B(u->_rex) << 3));
 			op->index = UD_R_RAX + (SIB_I(inp_curr(u)) | (REX_X(u->_rex) << 3));
 			/* special conditions for base reference */
@@ -654,6 +664,9 @@ decode_modrm_rm(struct ud* u,
 		/* Scale-Index-Base (SIB) */
 		if ((rm & 7) == 4) {
 			inp_next(u);
+			u->have_sib = 1;
+			u->sib_offset = u->inp_ctr - 1;
+			u->sib = inp_curr(u);
 
 			op->scale = (1 << SIB_S(inp_curr(u))) & ~1;
 			op->index = UD_R_EAX + (SIB_I(inp_curr(u)) | (REX_X(u->pfx_rex) << 3));
