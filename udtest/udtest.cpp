@@ -371,6 +371,12 @@ int main()
 		else {
 			printf("\t\tDISP:\tNONE\n");
 		}
+		if (ud_obj.have_imm) {
+			printf("\t\tIMM:\t0x%llX(%d)\n", ud_obj.imm, ud_obj.imm_offset);
+		}
+		else {
+			printf("\t\tIMM:\tNONE\n");
+		}
 
 		
 		//for (size_t i = 0; ; i++)

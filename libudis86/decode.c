@@ -491,6 +491,11 @@ decode_imm(struct ud* u, unsigned int size, struct ud_operand* op)
 	case 64: op->lval.uqword = inp_uint64(u); break;
 	default: return;
 	}
+
+	u->have_imm = 1;
+	u->imm_size = size / 8;
+	u->imm_offset = u->inp_ctr - u->imm_size;
+	u->imm = op->lval.uqword; 
 }
 
 
@@ -522,6 +527,10 @@ decode_mem_disp(struct ud* u, unsigned int size, struct ud_operand* op)
 	default:
 		return;
 	}
+	u->have_disp = 1;
+	u->disp_size = size / 8;
+	u->disp_offset = u->inp_ctr - u->disp_size;
+	u->disp = op->lval.uqword;
 }
 
 
@@ -694,11 +703,7 @@ decode_modrm_rm(struct ud* u,
 	}
 
 	if (offset) {
-		u->have_disp = 1;
-		u->disp_offset = u->inp_ctr;
-		u->disp_size = offset / 8;
 		decode_mem_disp(u, offset, op);
-		u->disp = op->lval.uqword;
 	}
 	else {
 		op->offset = 0;
