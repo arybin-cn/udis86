@@ -359,12 +359,26 @@ int main()
 	while (ud_disassemble(&ud_obj)) {
 		printf("0x%08llx(%d)\t%s\n", ud_insn_off(&ud_obj), ud_insn_len(&ud_obj), ud_insn_asm(&ud_obj));
 		printf("\t\t%s\n", ud_insn_hex(&ud_obj));
-		for (size_t i = 0; ; i++)
-		{
-			const ud_operand* op = ud_insn_opr(&ud_obj, i);
-			if (!op) break;
-			printf("\t\tOPRs(%s) -> %d -> %d\n", ud_opr_name(op->type), op->offset, op->_oprcode);
+		if (ud_obj.have_modrm) {
+			printf("\t\tModR/M:\t0x%X(%d)\n", ud_obj.modrm, ud_obj.modrm_offset);
 		}
+		else {
+			printf("\t\tModR/M:\tNONE\n");
+		}
+		if (ud_obj.have_disp) {
+			printf("\t\tDISP:\t0x%llX(%d)\n", ud_obj.disp, ud_obj.disp_offset);
+		}
+		else {
+			printf("\t\tDISP:\tNONE\n");
+		}
+
+		
+		//for (size_t i = 0; ; i++)
+		//{ 
+		//	const ud_operand* op = ud_insn_opr(&ud_obj, i);
+		//	if (!op) break;
+		//	printf("\t\tOPRs(%s) -> %d -> %d\n", ud_opr_name(op->type), op->offset, op->_oprcode);
+		//}
 		printf("\n");
 	}
 

@@ -490,28 +490,28 @@ decode_imm(struct ud* u, unsigned int size, struct ud_operand *op)
  *    Decode mem address displacement.
  */
 static void 
-decode_mem_disp(struct ud* u, unsigned int size, struct ud_operand *op)
+decode_mem_disp(struct ud* u, unsigned int size, struct ud_operand* op)
 {
-  switch (size) {
-  case 8:
-    op->offset = 8; 
-    op->lval.ubyte  = inp_uint8(u);
-    break;
-  case 16:
-    op->offset = 16; 
-    op->lval.uword  = inp_uint16(u); 
-    break;
-  case 32:
-    op->offset = 32; 
-    op->lval.udword = inp_uint32(u); 
-    break;
-  case 64:
-    op->offset = 64; 
-    op->lval.uqword = inp_uint64(u); 
-    break;
-  default:
-      return;
-  }
+	switch (size) {
+	case 8:
+		op->offset = 8;
+		op->lval.ubyte = inp_uint8(u);
+		break;
+	case 16:
+		op->offset = 16;
+		op->lval.uword = inp_uint16(u);
+		break;
+	case 32:
+		op->offset = 32;
+		op->lval.udword = inp_uint32(u);
+		break;
+	case 64:
+		op->offset = 64;
+		op->lval.uqword = inp_uint64(u);
+		break;
+	default:
+		return;
+	}
 }
 
 
@@ -669,7 +669,11 @@ decode_modrm_rm(struct ud         *u,
   }
 
   if (offset) {
+    u->have_disp = 1;
+    u->disp_offset = u->inp_ctr;
+	u->disp_size = offset / 8; 
     decode_mem_disp(u, offset, op);
+	u->disp = op->lval.uqword;
   } else {
     op->offset = 0;
   }
@@ -732,6 +736,7 @@ decode_operand(struct ud           *u,
 {
   operand->type = UD_NONE;
   operand->_oprcode = type;
+  operand->lval.uqword = 0;
 
   switch (type) {
     case OP_A :
@@ -936,7 +941,10 @@ clear_insn(register struct ud* u)
   u->pfx_str   = 0;
   u->mnemonic  = UD_Inone;
   u->itab_entry = NULL;
-  u->have_modrm = 0;
+  u->have_modrm = 0; 
+  u->have_sib = 0;
+  u->have_disp = 0;
+  u->have_imm = 0;
   u->br_far    = 0;
   u->vex_op    = 0;
   u->_rex      = 0;

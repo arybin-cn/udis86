@@ -223,9 +223,25 @@ struct ud
   uint8_t   adr_mode;
   uint8_t   br_far;
   uint8_t   br_near;
+
   uint8_t   have_modrm;
-  uint8_t   modrm;
   uint8_t   modrm_offset;
+  uint8_t   modrm;
+
+  uint8_t   have_sib;
+  uint8_t   sib_offset;
+  uint8_t   sib;
+
+  uint8_t   have_disp;
+  uint8_t   disp_offset;
+  uint8_t   disp_size;
+  uint64_t  disp;
+
+  uint8_t   have_imm;
+  uint8_t   imm_offset;
+  uint8_t   imm_size; 
+  uint64_t  imm;
+
   uint8_t   vex_op;
   uint8_t   vex_b1;
   uint8_t   vex_b2;
