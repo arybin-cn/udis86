@@ -714,7 +714,8 @@ decode_modrm_rm(struct ud* u,
 			offset = 16;
 		}
 	}
-
+	u->modrm_stk = (op->base == UD_R_BP || op->base == UD_R_EBP || op->base == UD_R_RBP ||
+		op->base == UD_R_SP || op->base == UD_R_ESP || op->base == UD_R_RSP);
 	if (offset) {
 		decode_mem_disp(u, offset, op);
 	}
@@ -986,6 +987,7 @@ clear_insn(register struct ud* u)
 	u->mnemonic = UD_Inone;
 	u->itab_entry = NULL;
 	u->have_modrm = 0;
+	u->modrm_stk = 0;
 	u->have_sib = 0;
 	u->have_disp = 0;
 	u->have_imm = 0;
