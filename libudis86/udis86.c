@@ -51,9 +51,21 @@ ud_init(struct ud* u)
 #ifndef __UD_STANDALONE__
     ud_set_input_file(u, stdin);
 #endif /* __UD_STANDALONE__ */
-
     ud_set_asm_buffer(u, u->asm_buf_int, sizeof(u->asm_buf_int));
+    u->fzy_disp_threshold = 0x20;
+    u->fzy_imm_threshold = 0x100;
 }
+
+/* =============================================================================
+ * ud_set_fzy_disp_threshold 
+ * =============================================================================
+ */ 
+uint64_t ;
+uint64_t fzy_imm_threshold;
+
+
+
+
 
 
 /* =============================================================================
@@ -208,7 +220,7 @@ ud_insn_hex_sig(struct ud* u, enum ud_fzy_lvl fzy_lvl)
             src_hex[i + 1] = '?';
         }
         if (u->have_disp) {
-            if (fzy_lvl == UD_FZY_HIGH || u->disp > FZY_DISP_THRESHOLD) {
+            if (fzy_lvl == UD_FZY_HIGH || u->disp > u->fzy_disp_threshold) {
                 for (i = u->disp_offset * 3, j = 0; j < u->disp_size; i += 3, j++) {
                     src_hex[i] = '?';
                     src_hex[i + 1] = '?';
@@ -216,7 +228,7 @@ ud_insn_hex_sig(struct ud* u, enum ud_fzy_lvl fzy_lvl)
             }
         }
         if (u->have_imm) {
-            if (fzy_lvl == UD_FZY_HIGH || u->imm > FZY_IMM_THRESHOLD) {
+            if (fzy_lvl == UD_FZY_HIGH || u->imm > u->fzy_imm_threshold) {
                 for (i = u->imm_offset * 3, j = 0; j < u->imm_size; i += 3, j++) {
                     src_hex[i] = '?';
                     src_hex[i + 1] = '?';
