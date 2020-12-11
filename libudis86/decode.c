@@ -487,15 +487,19 @@ decode_imm(struct ud* u, unsigned int size, struct ud_operand* op)
     switch (op->size) {
     case  8:
         op->lval.sbyte = inp_uint8(u);
+        u->imm = op->lval.sbyte;
         break;
     case 16:
         op->lval.uword = inp_uint16(u);
+        u->imm = op->lval.sword;
         break;
     case 32:
         op->lval.udword = inp_uint32(u);
+        u->imm = op->lval.sdword;
         break;
     case 64:
         op->lval.uqword = inp_uint64(u);
+        u->imm = op->lval.sqword;
         break;
     default:
         return;
@@ -503,7 +507,6 @@ decode_imm(struct ud* u, unsigned int size, struct ud_operand* op)
     u->have_imm = 1;
     u->imm_size = op->size / 8;
     u->imm_offset = u->inp_ctr - u->imm_size;
-    u->imm = op->lval.uqword;
 }
 
 
@@ -519,18 +522,22 @@ decode_mem_disp(struct ud* u, unsigned int size, struct ud_operand* op)
     case 8:
         op->offset = 8;
         op->lval.ubyte = inp_uint8(u);
+        u->disp = (int64_t)op->lval.sbyte;
         break;
     case 16:
         op->offset = 16;
         op->lval.uword = inp_uint16(u);
+        u->disp = (int64_t)op->lval.sword;
         break;
     case 32:
         op->offset = 32;
         op->lval.udword = inp_uint32(u);
+        u->disp = (int64_t)op->lval.sdword;
         break;
     case 64:
         op->offset = 64;
         op->lval.uqword = inp_uint64(u);
+        u->disp = (int64_t)op->lval.sqword;
         break;
     default:
         return;
@@ -538,7 +545,6 @@ decode_mem_disp(struct ud* u, unsigned int size, struct ud_operand* op)
     u->have_disp = 1;
     u->disp_size = size / 8;
     u->disp_offset = u->inp_ctr - u->disp_size;
-    u->disp = op->lval.uqword;
 }
 
 
@@ -714,6 +720,7 @@ decode_modrm_rm(struct ud* u,
             offset = 16;
         }
     }
+
     u->modrm_stk = (op->base == UD_R_BP || op->base == UD_R_EBP || op->base == UD_R_RBP ||
         op->base == UD_R_SP || op->base == UD_R_ESP || op->base == UD_R_RSP);
     if (offset) {

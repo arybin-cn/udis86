@@ -36,6 +36,12 @@
 
 static void ud_inp_init(struct ud* u);
 
+static uint64_t
+ud_abs(int64_t src) {
+    int64_t const mask = src >> sizeof(int) * 8 - 1;
+    return (src ^ mask) - mask;
+}
+
 /* =============================================================================
  * ud_init
  *    Initializes ud_t object.
@@ -52,20 +58,9 @@ ud_init(struct ud* u)
     ud_set_input_file(u, stdin);
 #endif /* __UD_STANDALONE__ */
     ud_set_asm_buffer(u, u->asm_buf_int, sizeof(u->asm_buf_int));
-    u->fzy_disp_threshold = 0x20;
-    u->fzy_imm_threshold = 0x100;
+    u->match_disp_threshold = 0x20;
+    u->match_imm_threshold = 0x100;
 }
-
-/* =============================================================================
- * ud_set_fzy_disp_threshold 
- * =============================================================================
- */ 
-uint64_t ;
-uint64_t fzy_imm_threshold;
-
-
-
-
 
 
 /* =============================================================================
@@ -194,58 +189,46 @@ ud_insn_hex(struct ud* u)
  * =============================================================================
  */
 const char*
-ud_insn_hex_sig(struct ud* u, enum ud_fzy_lvl fzy_lvl)
+ud_insn_hex_sig(struct ud* u, enum ud_match_lvl match_lvl)
 {
     uint8_t i, j;
     size_t insn_len;
     char* src_hex = (char*)u->insn_hexcode;
-
     ud_insn_hex(u);
-    switch (fzy_lvl)
-    {
-    case UD_FZY_LOW:
-        return src_hex;
-    case UD_FZY_MID:
-    case UD_FZY_HIGH:
-        if (u->have_modrm) {
-            if (fzy_lvl == UD_FZY_HIGH || u->have_sib || !u->modrm_stk) {
-                i = u->modrm_offset * 3;
-                src_hex[i] = '?';
-                src_hex[i + 1] = '?';
-            }
-        }
-        if (u->have_sib) {
-            i = u->sib_offset * 3;
-            src_hex[i] = '?';
-            src_hex[i + 1] = '?';
-        }
-        if (u->have_disp) {
-            if (fzy_lvl == UD_FZY_HIGH || u->disp > u->fzy_disp_threshold) {
-                for (i = u->disp_offset * 3, j = 0; j < u->disp_size; i += 3, j++) {
-                    src_hex[i] = '?';
-                    src_hex[i + 1] = '?';
-                }
-            }
-        }
-        if (u->have_imm) {
-            if (fzy_lvl == UD_FZY_HIGH || u->imm > u->fzy_imm_threshold) {
-                for (i = u->imm_offset * 3, j = 0; j < u->imm_size; i += 3, j++) {
-                    src_hex[i] = '?';
-                    src_hex[i + 1] = '?';
-                }
-            }
-        }
-        break;
-    case UD_FZY_ALL:
+    if (match_lvl == UD_MATCH_ALL) return src_hex;
+    if (match_lvl == UD_MATCH_NONE) {
         insn_len = ud_insn_len(u);
         for (i = 0, j = 0; j < insn_len; i += 3, j++) {
-            src_hex[i] = '?';
-            src_hex[i + 1] = '?';
+            src_hex[i] = '?'; src_hex[i + 1] = '?';
         }
-        break;
-    default:
-        break;
+        return src_hex;
     }
+
+    if (u->have_modrm && match_lvl < UD_MATCH_HIGH) {
+        i = u->modrm_offset * 3;
+        src_hex[i] = '?';
+        src_hex[i + 1] = '?';
+    }
+    if (u->have_sib && match_lvl < UD_MATCH_HIGH) {
+        i = u->sib_offset * 3;
+        src_hex[i] = '?';
+        src_hex[i + 1] = '?';
+    }
+    if (u->have_disp) {
+        if (ud_abs(u->disp) > u->match_disp_threshold || match_lvl < UD_MATCH_MID) {
+            for (i = u->disp_offset * 3, j = 0; j < u->disp_size; i += 3, j++) {
+                src_hex[i] = '?'; src_hex[i + 1] = '?';
+            }
+        }
+    }
+    if (u->have_imm) {
+        if (ud_abs(u->imm) > u->match_imm_threshold || match_lvl < UD_MATCH_MID) {
+            for (i = u->imm_offset * 3, j = 0; j < u->imm_size; i += 3, j++) {
+                src_hex[i] = '?'; src_hex[i + 1] = '?';
+            }
+        }
+    }
+
     return src_hex;
 }
 

@@ -82,7 +82,7 @@ extern LIBUDIS86_DLLEXTERN uint64_t ud_insn_off(const struct ud*);
 
 extern LIBUDIS86_DLLEXTERN const char* ud_insn_hex(struct ud*);
 
-extern LIBUDIS86_DLLEXTERN const char* ud_insn_hex_sig(struct ud*, enum ud_fzy_lvl fzy_lvl);
+extern LIBUDIS86_DLLEXTERN const char* ud_insn_hex_sig(struct ud*, enum ud_match_lvl fzy_lvl);
 
 extern LIBUDIS86_DLLEXTERN unsigned int ud_insn_len(const struct ud* u);
 

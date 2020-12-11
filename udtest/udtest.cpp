@@ -349,7 +349,7 @@ int main()
        0xC2, 0x14, 0x00, 0x8B, 0x84, 0x81, 0x7C, 0x01, 0x00, 0x00, 0x3E, 0x8B, 0x84, 0x85, 0x7C, 0x01,
        0x00, 0x00, 0xC7, 0x84, 0x80, 0x44, 0x33, 0x22, 0x11, 0x88, 0x77, 0x66, 0x55, 0x3E, 0xC7, 0x84,
        0x8D, 0x44, 0x33, 0x22, 0x11, 0x88, 0x77, 0x66, 0x55, 0x8B, 0x04, 0x24, 0xA1, 0x30, 0x41, 0xAB,
-       0x00
+       0x00, 0x75, 0xF0, 0xB8, 0x00, 0x00, 0x00, 0x11, 0x8B, 0xC1
     };
 
     ud_t ud_obj;
@@ -361,10 +361,12 @@ int main()
     ud_set_pc(&ud_obj, 0x012FAC60);
     while (ud_disassemble(&ud_obj)) {
         printf("0x%08llx(%d)\t%s\n", ud_insn_off(&ud_obj), ud_insn_len(&ud_obj), ud_insn_asm(&ud_obj));
-        printf("\t\tRaw:\t%s\n", ud_insn_hex(&ud_obj));
-        printf("\t\tSig(A):\t%s\n", ud_insn_hex_sig(&ud_obj, UD_FZY_ALL));
-        printf("\t\tSig(H):\t%s\n", ud_insn_hex_sig(&ud_obj, UD_FZY_HIGH));
-        printf("\t\tSig(M):\t%s\n", ud_insn_hex_sig(&ud_obj, UD_FZY_MID));
+        printf("\t\tRaw:\t%s\n", ud_insn_hex(&ud_obj)); 
+        printf("\t\tSig(A):\t%s\n", ud_insn_hex_sig(&ud_obj, UD_MATCH_ALL));
+        printf("\t\tSig(H):\t%s\n", ud_insn_hex_sig(&ud_obj, UD_MATCH_HIGH));
+        printf("\t\tSig(M):\t%s\n", ud_insn_hex_sig(&ud_obj, UD_MATCH_MID));
+        printf("\t\tSig(L):\t%s\n", ud_insn_hex_sig(&ud_obj, UD_MATCH_LOW));
+        printf("\t\tSig(N):\t%s\n", ud_insn_hex_sig(&ud_obj, UD_MATCH_NONE));
 
         if (ud_obj.have_modrm) {
             printf("\t\tModR/M:\t0x%X(%d)\n", ud_obj.modrm, ud_obj.modrm_offset);

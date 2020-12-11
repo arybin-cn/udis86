@@ -51,8 +51,8 @@
 # define UD_ATTR_PACKED
 #endif /* UD_ATTR_PACKED */
 
-enum ud_fzy_lvl {
-    UD_FZY_ALL, UD_FZY_HIGH, UD_FZY_MID, UD_FZY_LOW
+enum ud_match_lvl {
+    UD_MATCH_NONE, UD_MATCH_LOW, UD_MATCH_MID, UD_MATCH_HIGH, UD_MATCH_ALL
 };
 /* -----------------------------------------------------------------------------
  * All possible "types" of objects in udis86. Order is Important!
@@ -203,8 +203,8 @@ struct ud
     /*
      * Fuzzy signature use
      */
-    uint64_t fzy_disp_threshold;
-    uint64_t fzy_imm_threshold;
+    uint64_t match_disp_threshold;
+    uint64_t match_imm_threshold;
 
     /*
      * Symbol resolver for use in the translation phase.
@@ -244,12 +244,12 @@ struct ud
     uint8_t   have_disp;
     uint8_t   disp_offset;
     uint8_t   disp_size;
-    uint64_t  disp;
+    int64_t   disp;
 
     uint8_t   have_imm;
     uint8_t   imm_offset;
     uint8_t   imm_size;
-    uint64_t  imm;
+    int64_t   imm;
 
     uint8_t   vex_op;
     uint8_t   vex_b1;
@@ -264,7 +264,7 @@ struct ud
  * Type-definitions
  * -----------------------------------------------------------------------------
  */
-typedef enum ud_fzy_lvl			ud_fzy_lvl_t;
+typedef enum ud_match_lvl		ud_match_lvl_t;
 typedef enum ud_type			ud_type_t;
 typedef enum ud_mnemonic_code	ud_mnemonic_code_t;
 
