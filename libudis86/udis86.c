@@ -168,7 +168,7 @@ ud_insn_hex(struct ud* u)
     char* src_hex;
     src_hex = (char*) u->insn_hexcode;
     /* for each byte used to decode instruction */
-    for (i = 0; i < ud_insn_len(u) && i < sizeof(u->insn_hexcode) / 2;
+    for (i = 0; i < ud_insn_len(u) && i < sizeof(u->insn_hexcode) / 3;
          ++i, ++src_ptr) {
       sprintf(src_hex, "%02X ", *src_ptr & 0xFF);
       src_hex += 3;
@@ -177,6 +177,65 @@ ud_insn_hex(struct ud* u)
   return u->insn_hexcode;
 }
 
+/* =============================================================================
+ * ud_insn_hex_sig() - Returns hex signature form of disassembled instruction.
+ * =============================================================================
+ */
+const char*
+ud_insn_hex_sig(struct ud* u, enum ud_fzy_lvl fzy_lvl)
+{
+	uint8_t i, j;
+    size_t insn_len;
+	char* src_hex = (char*)u->insn_hexcode;
+
+    ud_insn_hex(u); 
+    switch (fzy_lvl)
+    {
+    case UD_FZY_LOW:
+		return src_hex;
+    case UD_FZY_MID:
+	case UD_FZY_HIGH:
+		if (u->have_modrm) {
+            if (fzy_lvl == UD_FZY_HIGH || u->have_sib || !u->modrm_stk) {
+                i = u->modrm_offset * 3;
+                src_hex[i] = '?';
+                src_hex[i + 1] = '?';
+            }
+		}
+        if (u->have_sib) {
+            i = u->sib_offset * 3;
+            src_hex[i] = '?';
+            src_hex[i + 1] = '?';
+        }
+        if (u->have_disp) {
+            if (fzy_lvl == UD_FZY_HIGH || u->disp > FZY_DISP_THRESHOLD) {
+				for (i = u->disp_offset * 3, j = 0; j < u->disp_size; i += 3, j++) {
+                    src_hex[i] = '?';
+					src_hex[i + 1] = '?';
+                }
+            }
+        }
+        if (u->have_imm) { 
+            if (fzy_lvl == UD_FZY_HIGH || u->imm > FZY_IMM_THRESHOLD) {
+				for (i = u->imm_offset * 3, j = 0; j < u->imm_size; i += 3, j++) {
+                    src_hex[i] = '?';
+                    src_hex[i + 1] = '?';
+                }
+            }
+        }
+        break;
+    case UD_FZY_ALL: 
+		insn_len = ud_insn_len(u);
+		for (i = 0, j = 0; j < insn_len; i += 3, j++) {
+            src_hex[i] = '?';
+            src_hex[i + 1] = '?';
+        }
+        break;
+    default:
+        break;
+    }
+    return src_hex;
+}
 
 /* =============================================================================
  * ud_insn_ptr

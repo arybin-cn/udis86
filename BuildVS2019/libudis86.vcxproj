@@ -295,6 +295,7 @@
     <ClInclude Include="..\libudis86\syn.h" />
     <ClInclude Include="..\libudis86\types.h" />
     <ClInclude Include="..\libudis86\udint.h" />
+    <ClInclude Include="..\udis86.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
