@@ -235,7 +235,7 @@ struct ud
     uint8_t   have_modrm;
     uint8_t   modrm_offset;
     uint8_t   modrm;
-    uint8_t   modrm_stk; //mark whether [?bp+?] or [?sp+?]
+    uint8_t   modrm_stb; //stable modrm, mark whether [?bp+?] or [?sp+?] or [disp]
 
     uint8_t   have_sib;
     uint8_t   sib_offset;

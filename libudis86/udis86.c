@@ -203,11 +203,12 @@ ud_insn_hex_sig(struct ud* u, enum ud_match_lvl match_lvl)
         }
         return src_hex;
     }
-
-    if (u->have_modrm && match_lvl < UD_MATCH_HIGH) {
-        i = u->modrm_offset * 3;
-        src_hex[i] = '?';
-        src_hex[i + 1] = '?';
+    if (u->have_modrm) {
+        if (match_lvl < UD_MATCH_HIGH || !u->modrm_stb) {
+            i = u->modrm_offset * 3;
+            src_hex[i] = '?';
+            src_hex[i + 1] = '?';
+        }
     }
     if (u->have_sib && match_lvl < UD_MATCH_HIGH) {
         i = u->sib_offset * 3;
